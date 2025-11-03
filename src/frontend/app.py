@@ -1,4 +1,4 @@
-from frontend import ExcelValidadorUI
+from frontend.frontend import ExcelValidadorUI
 
 def main():
     ui = ExcelValidadorUI()

@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 
 @pytest.fixture
 def driver():
-    process = subprocess.Popen(["streamlit", "run", "src/app.py"])
+    process = subprocess.Popen(["streamlit", "run", "src/frontend/app.py"])
     options = Options()
     options.headless = True
     driver = webdriver.Firefox(options=options)
