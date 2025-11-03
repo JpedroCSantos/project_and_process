@@ -6,13 +6,23 @@ authors = [
     {name = "Joao Pedro Santos",email = "jpedro.csantos@hotmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.13 ,<4.0"
 dependencies = [
-    "pydantic[email] (>=2.12.3,<3.0.0)",
-    "pytest (>=8.4.2,<9.0.0)"
+    "pydantic[email]>=2.12.3,<3.0.0",
+    "streamlit>=1.51.0,<2.0.0",
+    "selenium>=4.38.0,<5.0.0",
+    "taskipy (>=1.14.1,<2.0.0)",
 ]
 
+[tool.poetry.group.dev.dependencies]
+taskipy = ">=1.13.0,<2.0.0"
+pytest = ">=8.4.2,<9.0.0"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.taskipy.tasks]
+run = "powershell -Command \"Stop-Process -Id (Get-NetTCPConnection -LocalPort 8501 -State Listen).OwningProcess -Force -ErrorAction SilentlyContinue; streamlit run src/app.py\""
+test = "powershell -Command \"Stop-Process -Id (Get-NetTCPConnection -LocalPort 8501 -State Listen).OwningProcess -Force -ErrorAction SilentlyContinue; pytest tests -v\""
+docs = "powershell -Command \"Stop-Process -Id (Get-NetTCPConnection -LocalPort 8000 -State Listen).OwningProcess -Force -ErrorAction SilentlyContinue; mkdocs serve\""
