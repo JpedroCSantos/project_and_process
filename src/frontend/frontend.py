@@ -15,3 +15,33 @@ class ExcelValidadorUI:
 
     def display_header(self):
         st.title("Insira o seu excel para validação")
+
+    def upload_file(self):
+        return st.file_uploader("Carregue seu arquivo Excel/CSV aqui", type=["xlsx", "csv"])
+    
+    def display_results(self, result, error):
+        if error:
+            st.error(f"Erro na validação: {error}")
+        else:
+            st.success("O schema do arquivo Excel está correto!")
+
+    def display_dataframe(self, result):
+        st.dataframe(result, use_container_width=True)
+        
+    def display_save_button(self):
+        return st.button("Salvar no Banco de Dados")
+    
+    def display_wrong_message(self, message: str = None):
+        if message is not None:
+            return st.error(message)
+        else:
+            return st.error("Necessário corrigir a planilha!")
+        
+    def expander(self, message):
+        return st.expander(message)
+    
+    def display_error(self, e):
+        return st.error(str(e))
+    
+    def display_success_message(self):
+        return st.success("Dados salvos com sucesso no banco de dados!")

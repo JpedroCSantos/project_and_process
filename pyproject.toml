@@ -12,6 +12,10 @@ dependencies = [
     "streamlit>=1.51.0,<2.0.0",
     "selenium>=4.38.0,<5.0.0",
     "taskipy (>=1.14.1,<2.0.0)",
+    "psycopg2 (>=2.9.11,<3.0.0)",
+    "dotenv (>=0.9.9,<0.10.0)",
+    "pandas (>=2.3.3,<3.0.0)",
+    "loguru (>=0.7.3,<0.8.0)",
 ]
 
 [tool.poetry.group.dev.dependencies]
@@ -22,7 +26,12 @@ pytest = ">=8.4.2,<9.0.0"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.poetry]
+packages = [
+    { include = "src" }
+]
+
 [tool.taskipy.tasks]
-run = "powershell -Command \"Stop-Process -Id (Get-NetTCPConnection -LocalPort 8501 -State Listen).OwningProcess -Force -ErrorAction SilentlyContinue; streamlit run src/app.py\""
+run = "powershell -Command \"Stop-Process -Id (Get-NetTCPConnection -LocalPort 8501 -State Listen).OwningProcess -Force -ErrorAction SilentlyContinue; python -m streamlit run src/frontend/app.py\""
 test = "powershell -Command \"Stop-Process -Id (Get-NetTCPConnection -LocalPort 8501 -State Listen).OwningProcess -Force -ErrorAction SilentlyContinue; pytest tests -v\""
 docs = "powershell -Command \"Stop-Process -Id (Get-NetTCPConnection -LocalPort 8000 -State Listen).OwningProcess -Force -ErrorAction SilentlyContinue; mkdocs serve\""
