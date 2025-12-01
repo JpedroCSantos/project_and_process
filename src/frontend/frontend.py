@@ -21,12 +21,13 @@ class ExcelValidadorUI:
     
     def display_results(self, result, error):
         if error:
-            st.error(f"Erro na validação: {error}")
+            # st.error(f"Erro na validação: {error}")
+            st.error(f"Erro na validação!")
         else:
             st.success("O schema do arquivo Excel está correto!")
 
     def display_dataframe(self, result):
-        st.dataframe(result, use_container_width=True)
+        st.dataframe(result, width="stretch")
         
     def display_save_button(self):
         return st.button("Salvar no Banco de Dados")

@@ -1,61 +1,86 @@
 import pandas as pd
-from src.contracts.contract import Vendas
-from src.config.config import settings
-from pydantic import ValidationError
+import chardet
 
-def excel_to_df(file):
-    df = pd.read_excel(file, engine='openpyxl')
-    return df
+from datetime import datetime
+from src.contracts.contract import Vendas 
 
+class ExcelExtractor:
+    def __init__(self, file):
+        self.file = file
+        self.df = None
 
-def csv_to_df(file):
-    df = pd.read_csv(file, sep=';', encoding='latin1')
-    return df    
+    def extract(self):
+        """
+        Lê o arquivo (CSV ou Excel) detectando o encoding automaticamente.
+        """
+        try:
+            if self.file.name.endswith('.csv'):
+                raw_data = self.file.read()
+                result = chardet.detect(raw_data)
+                encoding = result['encoding']
+                self.file.seek(0)
+                self.df = pd.read_csv(self.file, sep=';', encoding=encoding)
+                self.df['created_at'] = datetime.now()
+            else:
+                self.df = pd.read_excel(self.file)
+            return self.df
+            
+        except Exception as e:
+            raise ValueError(f"Falha crítica ao ler o arquivo: {e}")
 
-def process_file(uploaded_file):
-    try:
-        error = None
-        if uploaded_file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-            df = excel_to_df(uploaded_file)
-        elif uploaded_file.type == "text/csv":
-            df = csv_to_df(uploaded_file)
-    
-        lista_de_aliases = [campo.alias for campo in Vendas.model_fields.values()]
-        extra_cols = set(df.columns) - set(lista_de_aliases)
+    def validate_data(self):
+        """
+        Aplica o contrato Pydantic linha a linha.
+        Retorna: (is_valid: bool, error_list: list[dict])
+        """
+        if self.df is None:
+            return False, [{"Linha": "N/A", "Erro": "Nenhum arquivo carregado."}]
 
-        if extra_cols:
-            error = f"Colunas extras detectadas no Excel: {', '.join(extra_cols)}"
-            return False, error, error
-
-        erros_coletados = []
-        for index, row in df.iterrows():
+        error_list = []
+        dados_limpos = []
+        for index, row in self.df.iterrows():
             try:
-                _ = Vendas(**row.to_dict())
-        
-            except ValidationError as e:
-                erros_da_linha = [f"**{err['loc'][0]}**: {err['msg']}" for err in e.errors()]
-                
-                erros_coletados.append({
-                    "Linha": index + 2,
-                    "Erros": "; ".join(erros_da_linha)
-                })
+                venda_validada = Vendas(**row.to_dict())          
+                dados_limpos.append(venda_validada.model_dump())
                 
             except Exception as e:
-                erros_coletados.append({
+                error_list.append({
                     "Linha": index + 2,
-                    "Erros": str(e)
+                    "Erro": str(e)
                 })
+        if error_list:
+            return False, error_list
+        self.df = pd.DataFrame(dados_limpos)
+        
+        return True, []
 
-        if len(erros_coletados):
-            return df, False, erros_coletados
+    def get_errors_as_df(self, error_list):
+        """
+        Converte a lista de dicionários de erro em um DataFrame para visualização.
+        """
+        if not error_list:
+            return pd.DataFrame()
+            
+        erros_df = pd.DataFrame(error_list)
+        
+        if "Linha" in erros_df.columns:
+            return erros_df.set_index("Linha")
+            
+        return erros_df
 
-        return df, True, None
+    def process_file(self):
+        """
+        Orquestrador principal.
+        Retorna: (df, result, error_list)
+        """
+        try:
+            self.extract()
+            
+        except ValueError as e:
+            return None, False, [{"Linha": "Arquivo", "Erro": str(e)}]
+        except Exception as e:
+            return None, False, [{"Linha": "Arquivo", "Erro": f"Erro inesperado: {e}"}]
 
-    except ValueError as ve:
-        return df, False, str(ve)
-    except Exception as e:
-        return df, False, f"Erro inesperado: {str(e)}"
-    
-def process_erros_df(error):
-    erros_df = pd.DataFrame(error).set_index("Linha")
-    return erros_df
+        is_valid, error_list = self.validate_data()
+        
+        return self.df, is_valid, error_list

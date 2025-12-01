@@ -16,6 +16,8 @@ dependencies = [
     "dotenv (>=0.9.9,<0.10.0)",
     "pandas (>=2.3.3,<3.0.0)",
     "loguru (>=0.7.3,<0.8.0)",
+    "sqlalchemy (>=2.0.44,<3.0.0)",
+    "chardet (>=5.2.0,<6.0.0)",
 ]
 
 [tool.poetry.group.dev.dependencies]
