@@ -20,7 +20,6 @@ class ExcelExtractor:
                 encoding = result['encoding']
                 self.file.seek(0)
                 self.df = pd.read_csv(self.file, sep=';', encoding=encoding)
-                self.df['created_at'] = datetime.now()
             else:
                 self.df = pd.read_excel(self.file)
             return self.df
