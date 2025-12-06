@@ -1,0 +1,27 @@
+name: ci
+
+on: pull_request
+
+jobs:
+    testes_de_integridade:
+        runs-on: ubunto-lastest
+
+        steps:
+            - name: first CI
+              run: echo hello hello
+
+            - name: What have where
+              run: echo $(ls)
+
+            - name: What directory
+              run: echo $(pwd)
+
+        # steps:
+        #     - name: Instalar poetry
+        #       uses: pip install poetry
+
+        #     -name: Instalar dependencias
+        #       uses: poetry install
+
+        #     -name: Executar testes
+        #       uses: task test
