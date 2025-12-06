@@ -22,7 +22,7 @@ jobs:
               run: poetry install
 
             - name: Entrar na máquina virtual
-              run: source .venv/script/activate
+              run: source .venv/scripts/activate
 
             - name: Executar testes
               run: task test
