@@ -1,3 +1,4 @@
+import os
 import pytest
 import psycopg2
 
@@ -6,7 +7,13 @@ from src.config.config import settings
 from sqlalchemy import create_engine, text
 
 def test_connect_db() -> str:
-    params = settings.dev_db_params
+    dev_db_params = {
+        "host": os.getenv("DB_HOST"),
+        "port": int(os.getenv("DB_PORT", 5432)),
+        "dbname": os.getenv("DB_NAME"),
+        "user": os.getenv("DB_USER"),
+        "password": os.getenv("DB_PASSWORD"),
+    }
     
     with psycopg2.connect(**params) as conn:
         assert conn is not None

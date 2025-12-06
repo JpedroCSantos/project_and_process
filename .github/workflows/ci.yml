@@ -21,28 +21,31 @@ jobs:
           --health-timeout=5s
           --health-retries=5
 
-    steps:
-      - name: Baixar o repositório
-        uses: actions/checkout@v4
+    env:
+      PG_HOST: localhost
+      PG_USER: testuser
+      PG_PASSWORD: testpassword
+      PG_DATABASE: testdb
+      PG_PORT: 5432
 
-      - name: Instalar Python
-        uses: actions/setup-python@v5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
         with:
           python-version-file: '.python-version'
-      
-      - name: Instalar Poetry
+
+      - name: Install Poetry
         run: pip install poetry
 
-      - name: Instalar dependências
+      - name: Install dependencies
         run: poetry install
 
-      - name: Instalar dependências Playwright
+      - name: Install Playwright system deps
         run: npx playwright install --with-deps
 
-      - name: Instalar browsers Playwright
-        run: npx playwright install chromium
+      - name: Install Playwright browsers (Python)
+        run: poetry run playwright install chromium
 
-      - name: Executar testes
-        env:
-          DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/testdb
+      - name: Run tests
         run: poetry run task test
