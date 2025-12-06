@@ -8,12 +8,25 @@ jobs:
 
         steps:
             - name: Baixar o repositório
-              uses: actions/checkout@v4 # Baixa o meu repositório git
+              uses: actions/checkout@v4
 
             - name: Instalar o python
               uses: actions/setup-python@v5
               with:
-                python-version-file: '.python-version'
+                python-version-file: '.python-version' 
+
+            - name: Instalar o Firefox e dependências
+              run: |
+                sudo apt-get update
+                sudo apt-get install -y firefox xvfb libgtk-3-0 libdbus-glib-1-2 
+
+            - name: Instalar o Geckodriver
+              run: |
+                GECKO_VERSION=$(curl -s https://api.github.com/repos/mozilla/geckodriver/releases/latest | jq -r '.tag_name')
+                wget https://github.com/mozilla/geckodriver/releases/download/$GECKO_VERSION/geckodriver-$GECKO_VERSION-linux64.tar.gz
+                tar -xvzf geckodriver-$GECKO_VERSION-linux64.tar.gz
+                sudo mv geckodriver /usr/local/bin/
+                rm geckodriver-$GECKO_VERSION-linux64.tar.gz
 
             - name: Instalar poetry
               run: pip install poetry

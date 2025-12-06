@@ -23,18 +23,18 @@ def test_vendas_com_dados_validos():
 
     venda = Vendas(**dados_validos)
 
-    assert venda.data_da_venda == dados_validos["Data da Venda"]
-    assert venda.nome_do_cliente == dados_validos["Nome do Cliente"]
-    assert venda.nome_do_vendedor == dados_validos["Nome do Vendedor"]
-    assert venda.empresas == dados_validos["Empresas"]
-    assert venda.duracao_do_projeto_meses == dados_validos["Duracao do Projeto (meses)"]
-    assert venda.valor_total_do_projeto_tcv == dados_validos["Valor Total do Projeto (TCV)"]
-    assert venda.comissao_do_vendedor == dados_validos["Comissao do Vendedor"]
-    assert venda.valor_da_parcela == dados_validos["Valor da Parcela (1 parcela)"]
-    assert venda.valor_do_caixa == dados_validos["Valor do Caixa (apos 1 parcela)"]
-    assert venda.valor_p_marketing == dados_validos["Valor p/ Marketing"]
-    assert venda.pago == (True if dados_validos["Pago?"] == "Sim" else False)
-    assert venda.observacoes == dados_validos["Observacoes"]
+    assert venda.Data_Venda == dados_validos["Data da Venda"].date()
+    assert venda.Nome_Cliente == dados_validos["Nome do Cliente"]
+    assert venda.Nome_Vendedor == dados_validos["Nome do Vendedor"]
+    assert venda.Empresa == dados_validos["Empresas"]
+    assert venda.Duracao_Projeto_meses == dados_validos["Duracao do Projeto (meses)"]
+    assert venda.Valor_Total_Projeto == dados_validos["Valor Total do Projeto (TCV)"]
+    assert venda.Comissao_Vendedor == dados_validos["Comissao do Vendedor"]
+    assert venda.Valor_primeira_Parcela == dados_validos["Valor da Parcela (1 parcela)"]
+    assert venda.Valor_Caixa_pos_Primeira_Parcela == dados_validos["Valor do Caixa (apos 1 parcela)"]
+    assert venda.Valor_Marketing == dados_validos["Valor p/ Marketing"]
+    assert venda.Pago == (True if dados_validos["Pago?"] == "Sim" else False)
+    assert venda.Observacoes == dados_validos["Observacoes"]
 
 def test_vendas_com_dados_invalidos():
     dado_invalidos = {
@@ -48,7 +48,7 @@ def test_vendas_com_dados_invalidos():
         "Valor da Parcela (1 parcela)": -10000,
         "Valor do Caixa (apos 1 parcela)": '',
         "Valor p/ Marketing": 10000,
-        "Pago?": False,
+        "Pago?": 123,
         "Observacoes": ""
     }
 
