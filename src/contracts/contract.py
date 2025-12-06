@@ -5,7 +5,7 @@ from pydantic import Field, BaseModel, EmailStr, PositiveFloat, PositiveInt, fie
 from src.utils.loader import VENDEDORES_ATIVOS
 
 class Vendas(BaseModel):
-    Data_Venda: datetime = Field(alias="Data da Venda")
+    Data_Venda: date = Field(alias="Data da Venda")
     Nome_Cliente: str = Field(alias="Nome do Cliente")
     Nome_Vendedor: str = Field(alias="Nome do Vendedor")
     Empresa: str = Field(alias="Empresas")
@@ -26,12 +26,18 @@ class Vendas(BaseModel):
         Se não retorna False.
         Caso contrário retorna Error.
         """
-        if value.lower() == 'sim':
-            return True
-        elif value.lower() == 'não' or value.lower() == 'nao':
-            return False
-        else:
-            raise ValueError
+        if isinstance(value, bool):
+            return value
+        
+        if isinstance(value, str):
+            v = value.strip().lower()
+            if v == "sim":
+                return True
+            if v in ("não", "nao"):
+                return False
+            raise ValueError("Valor inválido para 'Pago?': use 'Sim' ou 'Não'.")
+        
+        raise ValueError(f"Tipo inválido para 'Pago?': {type(value)}")
         
     @field_validator('Nome_Vendedor')
     @classmethod

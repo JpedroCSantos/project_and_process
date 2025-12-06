@@ -12,11 +12,11 @@ load_env()
 @dataclass(frozen=False)
 class Settings:
     dev_db_params: Dict[str, any] = field(default_factory=lambda: {
-        "host": os.getenv("PG_HOST", "localhost"),
-        "port": int(os.getenv("PG_PORT", "5432")),
-        "dbname": os.getenv("PG_DATABASE", "trips_analysis"),
-        "user": os.getenv("PG_USER", "etl_process"),
-        "password": os.getenv("PG_PASSWORD", "postgres")
+        "host": os.getenv("PG_HOST"),
+        "port": int(os.getenv("PG_PORT", 5432)),
+        "dbname": os.getenv("PG_DATABASE"),
+        "user": os.getenv("PG_USER"),
+        "password": os.getenv("PG_PASSWORD")
     })
     
 settings = Settings()

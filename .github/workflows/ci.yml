@@ -1,0 +1,51 @@
+name: ci
+
+on: pull_request
+
+jobs:
+  testes_de_integridade:
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+        options: >-
+          --health-cmd="pg_isready -U testuser"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      PG_HOST: localhost
+      PG_USER: testuser
+      PG_PASSWORD: testpassword
+      PG_DATABASE: testdb
+      PG_PORT: 5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: '.python-version'
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Install Playwright system deps
+        run: npx playwright install --with-deps
+
+      - name: Install Playwright browsers (Python)
+        run: poetry run playwright install chromium
+
+      - name: Run tests
+        run: poetry run task test
