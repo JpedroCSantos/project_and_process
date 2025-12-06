@@ -4,7 +4,7 @@ on: pull_request
 
 jobs:
     testes_de_integridade:
-        runs-on: ubuntu-lastest
+        runs-on: ubuntu-latest
 
         steps:
             - name: first CI
