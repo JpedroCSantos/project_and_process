@@ -1,26 +1,32 @@
-from selenium import webdriver
-from time import sleep
 import pytest
 import subprocess
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.common.by import By
+import requests
 
-@pytest.fixture
-def driver():
+from time import sleep
+from playwright.sync_api import sync_playwright
+
+def test_app_responde():
     process = subprocess.Popen(["streamlit", "run", "src/frontend/app.py"])
-    options = Options()
-    options.headless = True
-    driver = webdriver.Firefox(options=options)
-    driver.set_page_load_timeout(5)
-    yield driver
+    sleep(3)
 
-    driver.quit()
+    response = requests.get("http://localhost:8501")
+    assert response.status_code == 200
+    assert "<title>Streamlit</title>" in response.text
+
     process.kill()
 
-def test_check_title_is(driver):
-    driver.get("http://localhost:8501")
-    sleep(5)
-    page_title = driver.title
+def test_frontend_title():
+    process = subprocess.Popen(["streamlit", "run", "src/frontend/app.py"])
+    sleep(3)
 
-    expected_title = "Validador de Schemas Excel"
-    assert page_title == expected_title
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        page.goto("http://localhost:8501")
+
+        page.wait_for_load_state("networkidle")
+        title = page.title()
+        
+        assert title == "Validador de Schemas Excel"
+
+    process.kill()

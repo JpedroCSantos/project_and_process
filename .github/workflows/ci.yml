@@ -3,36 +3,56 @@ name: ci
 on: pull_request
 
 jobs:
-    testes_de_integridade:
-        runs-on: ubuntu-latest
+  testes_de_integridade:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Baixar o repositório
-              uses: actions/checkout@v4
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U testuser"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+        
+    env:
+      DB_HOST: localhost
+      DB_USER: testuser
+      DB_PASSWORD: testpass
+      DB_NAME: testdb
+      DB_PORT: 5432
 
-            - name: Instalar o python
-              uses: actions/setup-python@v5
-              with:
-                python-version-file: '.python-version' 
+    steps:
+          #   - name: Exportar variáveis de ambiente
+          #     run: |
+          #       echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
+          #       echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
+          #       echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
+          #       echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
+          #       echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
 
-            - name: Instalar o Firefox e dependências
-              run: |
-                sudo apt-get update
-                sudo apt-get install -y firefox xvfb libgtk-3-0 libdbus-glib-1-2 
+      - name: Baixar o repositório
+        uses: actions/checkout@v4
 
-            - name: Instalar o Geckodriver
-              run: |
-                GECKO_VERSION=$(curl -s https://api.github.com/repos/mozilla/geckodriver/releases/latest | jq -r '.tag_name')
-                wget https://github.com/mozilla/geckodriver/releases/download/$GECKO_VERSION/geckodriver-$GECKO_VERSION-linux64.tar.gz
-                tar -xvzf geckodriver-$GECKO_VERSION-linux64.tar.gz
-                sudo mv geckodriver /usr/local/bin/
-                rm geckodriver-$GECKO_VERSION-linux64.tar.gz
+      - name: Instalar o Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: '.python-version'
 
-            - name: Instalar poetry
-              run: pip install poetry
+      - name: Instalar navegadores do Playwright
+        uses: microsoft/playwright-github-action@v1
 
-            - name: Instalar dependencias
-              run: poetry install
+      - name: Instalar Poetry
+        run: pip install poetry
 
-            - name: Executar testes
-              run: poetry run task test
+      - name: Instalar dependências
+        run: poetry install
+
+      - name: Executar testes
+        run: poetry run task test
