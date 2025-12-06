@@ -7,52 +7,42 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      postgres:
+      db:
         image: postgres:15
-        env:
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpass
-          POSTGRES_DB: testdb
         ports:
           - 5432:5432
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
         options: >-
           --health-cmd="pg_isready -U testuser"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
-        
-    env:
-      DB_HOST: localhost
-      DB_USER: testuser
-      DB_PASSWORD: testpass
-      DB_NAME: testdb
-      DB_PORT: 5432
 
     steps:
-          #   - name: Exportar variáveis de ambiente
-          #     run: |
-          #       echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
-          #       echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
-          #       echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
-          #       echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
-          #       echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
-
       - name: Baixar o repositório
         uses: actions/checkout@v4
 
-      - name: Instalar o Python
+      - name: Instalar Python
         uses: actions/setup-python@v5
         with:
           python-version-file: '.python-version'
-
-      - name: Instalar navegadores do Playwright
-        uses: microsoft/playwright-github-action@v1
-
+      
       - name: Instalar Poetry
         run: pip install poetry
 
       - name: Instalar dependências
         run: poetry install
 
+      - name: Instalar dependências Playwright
+        run: npx playwright install --with-deps
+
+      - name: Instalar browsers Playwright
+        run: npx playwright install chromium
+
       - name: Executar testes
+        env:
+          DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/testdb
         run: poetry run task test
