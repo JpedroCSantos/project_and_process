@@ -35,5 +35,6 @@ packages = [
 
 [tool.taskipy.tasks]
 run = "powershell -Command \"Stop-Process -Id (Get-NetTCPConnection -LocalPort 8501 -State Listen).OwningProcess -Force -ErrorAction SilentlyContinue; python -m streamlit run src/frontend/app.py\""
-test = "powershell -Command \"Stop-Process -Id (Get-NetTCPConnection -LocalPort 8501 -State Listen).OwningProcess -Force -ErrorAction SilentlyContinue; pytest tests -v\""
+test_local = "powershell -Command \"Stop-Process -Id (Get-NetTCPConnection -LocalPort 8501 -State Listen).OwningProcess -Force -ErrorAction SilentlyContinue; pytest tests -v\""
+test = "pytest -m tests -v\""
 docs = "powershell -Command \"Stop-Process -Id (Get-NetTCPConnection -LocalPort 8000 -State Listen).OwningProcess -Force -ErrorAction SilentlyContinue; mkdocs serve\""
