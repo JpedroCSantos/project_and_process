@@ -10,9 +10,6 @@ jobs:
             - name: Baixar o repositório
               uses: actions/checkout@v4 # Baixa o meu repositório git
 
-            - name: Entrar no repositório
-              run: echo $(ls) #cd project_and_process # Baixa o meu repositório git
-
             - name: Instalar o python
               uses: actions/setup-python@v5
               with:
@@ -23,6 +20,9 @@ jobs:
 
             - name: Instalar dependencias
               run: poetry install
+
+            - name: Entrar na máquina virtual
+              run: source .venv/script/activate
 
             - name: Executar testes
               run: task test
