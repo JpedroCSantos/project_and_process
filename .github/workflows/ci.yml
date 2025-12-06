@@ -21,8 +21,5 @@ jobs:
             - name: Instalar dependencias
               run: poetry install
 
-            - name: Entrar na máquina virtual
-              run: source .venv/scripts/activate
-
             - name: Executar testes
-              run: task test
+              run: poetry run task test
