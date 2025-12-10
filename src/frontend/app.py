@@ -1,6 +1,14 @@
+import sentry_sdk
+
 from frontend import ExcelValidadorUI
 from src.backend.excel_extrator import ExcelExtractor
 from src.backend.db_conection import send_dataframe_to_database 
+from src.config.config import settings
+
+sentry_sdk.init(
+    dsn= settings.sentry_dev,
+    send_default_pii=True,
+)
 
 def main():
     ui = ExcelValidadorUI()
@@ -14,6 +22,7 @@ def main():
         if error:
             message = (f"Encontramos {len(error)} linhas com problemas no seu arquivo. Por favor, corrija-as e faça o upload novamente.")
             ui.display_wrong_message(message)
+            sentry_sdk.capture_message(f"Encontramos {len(error)} linhas com problemas no seu arquivo. Por favor, corrija-as e faça o upload novamente.")
             with ui.expander("Clique aqui para ver os detalhes dos erros"):
                 erros_df = extractor.get_errors_as_df(error)
                 ui.display_dataframe(erros_df)
@@ -22,6 +31,7 @@ def main():
             result = send_dataframe_to_database(df)
             if result is not None:
                 ui.display_wrong_message(result)
+            sentry_sdk.capture_message("Dados salvos com sucesso no banco de dados!")
             ui.display_success_message()
 
 if __name__ == "__main__":
