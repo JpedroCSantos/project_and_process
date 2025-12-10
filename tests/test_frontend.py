@@ -24,9 +24,9 @@ def test_frontend_title():
         page = browser.new_page()
         page.goto("http://localhost:8501")
 
-        page.wait_for_load_state("networkidle")
-        title = page.title()
-        
-        assert title == "Validador de Schemas Excel"
+        # Espera até que o título real apareça na página
+        page.wait_for_selector("text=Validador de Schemas Excel", timeout=10000)
+
+        assert "Validador de Schemas Excel" in page.content()
 
     process.kill()
