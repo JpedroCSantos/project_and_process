@@ -3,9 +3,10 @@ import sentry_sdk
 from frontend import ExcelValidadorUI
 from src.backend.excel_extrator import ExcelExtractor
 from src.backend.db_conection import send_dataframe_to_database 
+from src.config.config import settings
 
 sentry_sdk.init(
-    dsn= "https://b1e46bb04e6bf1e6b2266f52929a2e21@o4510507766382592.ingest.us.sentry.io/4510507913838592",
+    dsn= settings.sentry_dev,
     send_default_pii=True,
 )
 

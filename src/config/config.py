@@ -18,5 +18,6 @@ class Settings:
         "user": os.getenv("PG_USER"),
         "password": os.getenv("PG_PASSWORD")
     })
+    sentry_dev: str = os.getenv("SENTRY_DNS")
     
 settings = Settings()
